@@ -11,5 +11,8 @@ export default defineConfig({
       name: '@localeasy/core',
       fileName: 'core',
     },
+    rollupOptions: {
+      external: ['fs', 'path'],
+    },
   },
 });
