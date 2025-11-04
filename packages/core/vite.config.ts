@@ -1,7 +1,5 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import dts from 'vite-plugin-dts';
-
-import path from 'path';
 
 export default defineConfig({
   plugins: [dts({ insertTypesEntry: true })],
@@ -10,9 +8,14 @@ export default defineConfig({
       entry: 'src/index.ts',
       name: '@localeasy/core',
       fileName: 'core',
+      formats: ['es', 'cjs'],
     },
     rollupOptions: {
       external: ['fs', 'path'],
     },
+  },
+  test: {
+    globals: true,
+    environment: 'node',
   },
 });
