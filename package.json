@@ -1,5 +1,5 @@
 {
-  "name": "localeasy",
+  "name": "@localeasy/monorepo",
   "private": true,
   "scripts": {
     "build": "turbo run build",
