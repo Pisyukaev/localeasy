@@ -2,6 +2,9 @@
   "name": "@localeasy/cli",
   "version": "1.0.1",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite build --watch",
     "build": "tsc && vite build",

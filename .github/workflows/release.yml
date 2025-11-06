@@ -43,7 +43,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: pnpm changeset publish
+          publish: pnpm changeset publish --access public
           commit: 'chore: version packages'
           title: 'chore: version packages'
         env:
