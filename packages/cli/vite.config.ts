@@ -11,12 +11,11 @@ export default defineConfig({
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['commander', 'readline', '@localeasy/core'],
+      external: ['commander', 'readline', 'fs', 'path', 'readline/promises'],
       output: {
         globals: {
           commander: 'commander',
           readline: 'readline',
-          '@localeasy/core': '@localeasy/core',
         },
       },
     },

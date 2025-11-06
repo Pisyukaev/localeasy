@@ -23,13 +23,13 @@ importers:
 
   packages/cli:
     dependencies:
-      '@localeasy/core':
-        specifier: workspace:*
-        version: link:../core
       commander:
         specifier: ^14.0.1
         version: 14.0.1
     devDependencies:
+      '@localeasy/core':
+        specifier: workspace:*
+        version: link:../core
       '@types/node':
         specifier: ^24.5.2
         version: 24.9.1
