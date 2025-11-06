@@ -9,7 +9,7 @@ import {
 
 export const addCommand = new Command('add')
   .description('Add a new translation entry')
-  .option('-f, --file <path>', 'Path to the locale file', './locales/en.json')
+  .option('-f, --file <path>', 'Path to the locale file')
   .option('-d, --directory <path>', 'Directory containing locale files')
   .option('-k, --key <key>', 'Translation key')
   .option('-v, --value <value>', 'Translation value')

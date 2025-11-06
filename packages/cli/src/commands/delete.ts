@@ -22,7 +22,7 @@ function performDeletion(data: LocaleData, key: string, file: string) {
 
 export const deleteCommand = new Command('delete')
   .description('Delete a translation entry')
-  .option('-f, --file <path>', 'Path to the locale file', './locales/en.json')
+  .option('-f, --file <path>', 'Path to the locale file')
   .option('-k, --key <key>', 'Translation key to delete')
   .option('--force', 'Force deletion without confirmation')
   .action((options) => {
