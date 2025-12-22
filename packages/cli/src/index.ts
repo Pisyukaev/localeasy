@@ -6,6 +6,7 @@ import {
   deleteCommand,
   initCommand,
   sortCommand,
+  uiCommand,
 } from './commands';
 
 import { version } from '../package.json';
@@ -21,5 +22,6 @@ program.addCommand(initCommand);
 program.addCommand(addCommand);
 program.addCommand(deleteCommand);
 program.addCommand(sortCommand);
+program.addCommand(uiCommand);
 
 program.parse();
