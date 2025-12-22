@@ -1,0 +1,2 @@
+export { ThemeProviderWrapper } from './theme';
+

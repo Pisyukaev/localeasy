@@ -1,0 +1,2 @@
+export { LocaleEditor } from './ui';
+
