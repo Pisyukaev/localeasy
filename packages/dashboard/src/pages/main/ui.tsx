@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography';
 
 import { LocaleList } from 'widgets/locale-list';
 import { LocaleEditor } from 'widgets/locale-editor';
+import { AddKeyToAllForm } from 'features/add-key-to-all';
 
 const styles = {
   container: {
@@ -22,6 +23,11 @@ const styles = {
     flex: 1,
     overflow: 'hidden',
   },
+  addKeyToAll: {
+    p: 2,
+    borderBottom: 1,
+    borderColor: 'divider',
+  },
 };
 
 export function MainPage() {
@@ -37,6 +43,9 @@ export function MainPage() {
       <Box sx={styles.content}>
         <LocaleList />
         <Box sx={styles.editor}>
+          <Box sx={styles.addKeyToAll}>
+            <AddKeyToAllForm />
+          </Box>
           <LocaleEditor />
         </Box>
       </Box>

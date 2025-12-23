@@ -9,6 +9,12 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 import SortIcon from '@mui/icons-material/Sort';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -23,7 +29,6 @@ import { sortKeys } from 'features/sort-keys';
 import { editKey, editKeyAndName } from 'features/edit-key';
 import { deleteKey, DeleteKeyDialog } from 'features/delete-key';
 import { AddKeyForm } from 'features/add-key';
-import { AddKeyToAllForm } from 'features/add-key-to-all';
 
 export function LocaleEditor() {
   const [selectedLocale, localeFile, loading, error] = useUnit([
@@ -182,8 +187,15 @@ export function LocaleEditor() {
         </Alert>
       )}
 
-      <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
-        <AddKeyToAllForm />
+      <Box
+        sx={{
+          p: 2,
+          overflow: 'auto',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <AddKeyForm />
 
         {keys.length === 0 ? (
@@ -191,97 +203,134 @@ export function LocaleEditor() {
             No keys in this file
           </Paper>
         ) : (
-          <Stack spacing={2}>
-            {keys.map((key) => (
-              <Paper key={key} sx={{ p: 2 }}>
-                {editingKey === key ? (
-                  <Stack spacing={2}>
-                    <TextField
-                      label="Key"
-                      value={editKeyName}
-                      onChange={(e) => {
-                        setEditKeyName(e.target.value);
-                        setEditError(null);
-                      }}
-                      size="small"
-                      fullWidth
-                      error={!!editError}
-                      sx={{ fontFamily: 'monospace' }}
-                      autoFocus
-                    />
-                    <TextField
-                      label="Value"
-                      fullWidth
-                      multiline
-                      value={editValue}
-                      onChange={(e) => {
-                        setEditValue(e.target.value);
-                        setEditError(null);
-                      }}
-                      size="small"
-                    />
-                    {editError && (
-                      <Alert severity="error" sx={{ mt: 1 }}>
-                        {editError}
-                      </Alert>
+          <TableContainer component={Paper} sx={{ flex: 1, overflow: 'auto' }}>
+            <Table stickyHeader aria-label="locale keys table">
+              <TableHead>
+                <TableRow>
+                  <TableCell
+                    sx={{ fontFamily: 'monospace', fontWeight: 'bold' }}
+                  >
+                    Key
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Value</TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{ fontWeight: 'bold', width: 120 }}
+                  >
+                    Actions
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {keys.map((key) => (
+                  <TableRow key={key} hover>
+                    {editingKey === key ? (
+                      <>
+                        <TableCell>
+                          <TextField
+                            value={editKeyName}
+                            onChange={(e) => {
+                              setEditKeyName(e.target.value);
+                              setEditError(null);
+                            }}
+                            size="small"
+                            fullWidth
+                            error={!!editError}
+                            sx={{ fontFamily: 'monospace' }}
+                            autoFocus
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            fullWidth
+                            multiline
+                            value={editValue}
+                            onChange={(e) => {
+                              setEditValue(e.target.value);
+                              setEditError(null);
+                            }}
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Stack
+                            direction="row"
+                            spacing={1}
+                            justifyContent="flex-end"
+                          >
+                            <Button
+                              variant="contained"
+                              size="small"
+                              onClick={handleEditSave}
+                              disabled={loading}
+                            >
+                              Save
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={handleEditCancel}
+                              disabled={loading}
+                            >
+                              Cancel
+                            </Button>
+                          </Stack>
+                          {editError && (
+                            <Alert severity="error" sx={{ mt: 1 }}>
+                              {editError}
+                            </Alert>
+                          )}
+                        </TableCell>
+                      </>
+                    ) : (
+                      <>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{ fontFamily: 'monospace' }}
+                        >
+                          {key}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word',
+                            maxWidth: 400,
+                          }}
+                        >
+                          {localeFile.data[key]}
+                        </TableCell>
+                        <TableCell align="right">
+                          <Stack
+                            direction="row"
+                            spacing={1}
+                            justifyContent="flex-end"
+                          >
+                            <IconButton
+                              size="small"
+                              onClick={() => handleEditStart(key)}
+                              disabled={loading}
+                              color="primary"
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDeleteClick(key)}
+                              disabled={loading}
+                              color="error"
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Stack>
+                        </TableCell>
+                      </>
                     )}
-                    <Stack direction="row" spacing={1}>
-                      <Button
-                        variant="contained"
-                        onClick={handleEditSave}
-                        disabled={loading}
-                      >
-                        Save
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        onClick={handleEditCancel}
-                        disabled={loading}
-                      >
-                        Cancel
-                      </Button>
-                    </Stack>
-                  </Stack>
-                ) : (
-                  <Stack direction="row" spacing={2} alignItems="flex-start">
-                    <Box sx={{ flex: 1 }}>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{ fontFamily: 'monospace', mb: 1 }}
-                      >
-                        {key}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
-                      >
-                        {localeFile.data[key]}
-                      </Typography>
-                    </Box>
-                    <Stack direction="row" spacing={1}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleEditStart(key)}
-                        disabled={loading}
-                        color="primary"
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDeleteClick(key)}
-                        disabled={loading}
-                        color="error"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Stack>
-                  </Stack>
-                )}
-              </Paper>
-            ))}
-          </Stack>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
       </Box>
 
