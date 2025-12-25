@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { useUnit } from 'effector-react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
+import Toolbar from '@mui/material/Toolbar';
+import Chip from '@mui/material/Chip';
+import Divider from '@mui/material/Divider';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -18,24 +20,79 @@ import TableRow from '@mui/material/TableRow';
 import SortIcon from '@mui/icons-material/Sort';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import LanguageIcon from '@mui/icons-material/Language';
+import PostAddIcon from '@mui/icons-material/PostAdd';
+import Tooltip from '@mui/material/Tooltip';
 
 import {
   $selectedLocale,
   $localeFile,
   $loading,
   $error,
+  $locales,
 } from 'entities/locale';
 import { sortKeys } from 'features/sort-keys';
 import { editKey, editKeyAndName } from 'features/edit-key';
 import { deleteKey, DeleteKeyDialog } from 'features/delete-key';
-import { AddKeyForm } from 'features/add-key';
+import { AddKeyToAllDialog } from 'features/add-key-to-all';
+
+const styles = {
+  fallback: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+  },
+  error: {
+    flex: 1,
+    p: 2,
+  },
+  mainContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+  },
+  toolbar: {
+    minHeight: '56px',
+    px: 2,
+    justifyContent: 'space-between',
+  },
+  chip: {
+    fontFamily: 'monospace',
+    fontWeight: 600,
+    height: 28,
+  },
+  paper: {
+    p: 3,
+    textAlign: 'center',
+    color: 'text.secondary',
+  },
+  tableContainer: {
+    flex: 1,
+    overflow: 'auto',
+  },
+  keyCell: {
+    fontFamily: 'monospace',
+    fontWeight: 'bold',
+  },
+  valueCell: {
+    fontWeight: 'bold',
+  },
+  actionsCell: {
+    fontWeight: 'bold',
+    width: 120,
+  },
+};
 
 export function LocaleEditor() {
-  const [selectedLocale, localeFile, loading, error] = useUnit([
+  const [selectedLocale, localeFile, loading, error, locales] = useUnit([
     $selectedLocale,
     $localeFile,
     $loading,
     $error,
+    $locales,
   ]);
 
   const [editingKey, setEditingKey] = useState<string | null>(null);
@@ -44,34 +101,17 @@ export function LocaleEditor() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [keyToDelete, setKeyToDelete] = useState<string | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
+  const [addToAllDialogOpen, setAddToAllDialogOpen] = useState(false);
 
   if (!selectedLocale) {
     return (
-      <Box
-        sx={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100%',
-        }}
-      >
-        Select a locale file to view and edit
-      </Box>
+      <Box sx={styles.fallback}>Select a locale file to view and edit</Box>
     );
   }
 
   if (loading && !localeFile) {
     return (
-      <Box
-        sx={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100%',
-        }}
-      >
+      <Box sx={styles.fallback}>
         <CircularProgress />
       </Box>
     );
@@ -79,7 +119,7 @@ export function LocaleEditor() {
 
   if (error && !localeFile) {
     return (
-      <Box sx={{ flex: 1, p: 2 }}>
+      <Box sx={styles.error}>
         <Alert severity="error">{error}</Alert>
       </Box>
     );
@@ -154,32 +194,44 @@ export function LocaleEditor() {
   };
 
   return (
-    <Box
-      sx={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-      }}
-    >
-      <Paper sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-        <Stack
-          direction="row"
-          spacing={2}
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <Typography variant="h6">{selectedLocale}</Typography>
-          <Button
-            variant="outlined"
-            startIcon={<SortIcon />}
-            onClick={() => sortKeys()}
-            disabled={loading}
-          >
-            Sort Keys
-          </Button>
-        </Stack>
-      </Paper>
+    <Box sx={styles.mainContainer}>
+      <Box
+        sx={{
+          borderBottom: 1,
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+        }}
+      >
+        <Toolbar variant="dense" sx={styles.toolbar}>
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <LanguageIcon color="action" fontSize="small" />
+            <Chip label={selectedLocale} size="small" sx={styles.chip} />
+          </Stack>
+          <Stack direction="row" spacing={0.5}>
+            <Tooltip title="Add key to all files">
+              <IconButton
+                size="small"
+                onClick={() => setAddToAllDialogOpen(true)}
+                disabled={loading || locales.length === 0}
+                color="primary"
+              >
+                <PostAddIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Sort keys alphabetically">
+              <IconButton
+                size="small"
+                onClick={() => sortKeys()}
+                disabled={loading}
+                color="primary"
+              >
+                <SortIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        </Toolbar>
+        <Divider />
+      </Box>
 
       {error && (
         <Alert severity="error" sx={{ m: 2 }}>
@@ -196,27 +248,16 @@ export function LocaleEditor() {
           flexDirection: 'column',
         }}
       >
-        <AddKeyForm />
-
         {keys.length === 0 ? (
-          <Paper sx={{ p: 3, textAlign: 'center', color: 'text.secondary' }}>
-            No keys in this file
-          </Paper>
+          <Paper sx={styles.paper}>No keys in this file</Paper>
         ) : (
-          <TableContainer component={Paper} sx={{ flex: 1, overflow: 'auto' }}>
+          <TableContainer component={Paper} sx={styles.tableContainer}>
             <Table stickyHeader aria-label="locale keys table">
               <TableHead>
                 <TableRow>
-                  <TableCell
-                    sx={{ fontFamily: 'monospace', fontWeight: 'bold' }}
-                  >
-                    Key
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Value</TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{ fontWeight: 'bold', width: 120 }}
-                  >
+                  <TableCell sx={styles.keyCell}>Key</TableCell>
+                  <TableCell sx={styles.valueCell}>Value</TableCell>
+                  <TableCell align="right" sx={styles.actionsCell}>
                     Actions
                   </TableCell>
                 </TableRow>
@@ -340,6 +381,11 @@ export function LocaleEditor() {
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={handleDeleteConfirm}
         loading={loading}
+      />
+
+      <AddKeyToAllDialog
+        open={addToAllDialogOpen}
+        onClose={() => setAddToAllDialogOpen(false)}
       />
     </Box>
   );

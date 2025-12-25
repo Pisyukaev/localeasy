@@ -1,4 +1,3 @@
 export { AddKeyToAllForm } from './ui';
-export { addKeyToAll } from './model';
-export type { AddKeyToAllParams } from './model';
-
+export { AddKeyToAllDialog } from './dialog';
+export { addKeyToAll, type AddKeyToAllParams } from './model';
