@@ -55,14 +55,12 @@ const styles = {
     overflow: 'hidden',
   },
   toolbar: {
-    minHeight: '56px',
-    px: 2,
+    p: 2,
     justifyContent: 'space-between',
   },
   chip: {
     fontFamily: 'monospace',
     fontWeight: 600,
-    height: 28,
   },
   paper: {
     p: 3,
@@ -78,9 +76,11 @@ const styles = {
     fontWeight: 'bold',
   },
   valueCell: {
+    fontFamily: 'monospace',
     fontWeight: 'bold',
   },
   actionsCell: {
+    fontFamily: 'monospace',
     fontWeight: 'bold',
     width: 120,
   },
@@ -195,43 +195,36 @@ export function LocaleEditor() {
 
   return (
     <Box sx={styles.mainContainer}>
-      <Box
-        sx={{
-          borderBottom: 1,
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
-        }}
-      >
-        <Toolbar variant="dense" sx={styles.toolbar}>
-          <Stack direction="row" spacing={1.5} alignItems="center">
-            <LanguageIcon color="action" fontSize="small" />
-            <Chip label={selectedLocale} size="small" sx={styles.chip} />
-          </Stack>
-          <Stack direction="row" spacing={0.5}>
-            <Tooltip title="Add key to all files">
-              <IconButton
-                size="small"
-                onClick={() => setAddToAllDialogOpen(true)}
-                disabled={loading || locales.length === 0}
-                color="primary"
-              >
-                <PostAddIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Sort keys alphabetically">
-              <IconButton
-                size="small"
-                onClick={() => sortKeys()}
-                disabled={loading}
-                color="primary"
-              >
-                <SortIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-        </Toolbar>
-        <Divider />
-      </Box>
+      <Toolbar />
+      <Toolbar sx={styles.toolbar}>
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <LanguageIcon color="action" />
+          <Chip label={selectedLocale} size="small" sx={styles.chip} />
+        </Stack>
+        <Stack direction="row" spacing={0.5}>
+          <Tooltip title="Add key to all files">
+            <IconButton
+              size="small"
+              onClick={() => setAddToAllDialogOpen(true)}
+              disabled={loading || locales.length === 0}
+              color="primary"
+            >
+              <PostAddIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Sort keys alphabetically">
+            <IconButton
+              size="small"
+              onClick={() => sortKeys()}
+              disabled={loading}
+              color="primary"
+            >
+              <SortIcon />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+      </Toolbar>
+      <Divider />
 
       {error && (
         <Alert severity="error" sx={{ m: 2 }}>

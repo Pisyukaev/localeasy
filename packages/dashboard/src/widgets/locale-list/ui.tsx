@@ -1,16 +1,19 @@
 import { useEffect } from 'react';
 import { useUnit } from 'effector-react';
+import Drawer from '@mui/material/Drawer';
+import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import Paper from '@mui/material/Paper';
+import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
+import LinearProgress from '@mui/material/LinearProgress';
 import Alert from '@mui/material/Alert';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import type { Theme } from '@mui/material/styles';
 
 import {
   loadLocales,
@@ -31,11 +34,17 @@ const styles = {
   },
   header: {
     p: 2,
-    borderBottom: 1,
-    borderColor: 'divider',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  drawer: {
+    width: (theme: Theme) => theme.spacing(30),
+    flexShrink: 0,
+    [`& .MuiDrawer-paper`]: {
+      width: (theme: Theme) => theme.spacing(30),
+      boxSizing: 'border-box',
+    },
   },
   loading: {
     display: 'flex',
@@ -71,13 +80,15 @@ export function LocaleList() {
   }, []);
 
   return (
-    <Paper sx={styles.paper}>
+    <Drawer variant="permanent" sx={styles.drawer}>
+      <Toolbar />
       <Box sx={styles.header}>
         <Typography variant="h6">Locale Files</Typography>
         <IconButton size="small" onClick={handleLoadLocales} disabled={loading}>
           <RefreshIcon />
         </IconButton>
       </Box>
+      <Divider />
 
       {error && (
         <Alert severity="error" sx={{ m: 2 }}>
@@ -87,7 +98,7 @@ export function LocaleList() {
 
       {loading && locales.length === 0 ? (
         <Box sx={styles.loading}>
-          <CircularProgress size={24} />
+          <LinearProgress />
         </Box>
       ) : locales.length === 0 ? (
         <Box sx={styles.noLocales}>No locale files found</Box>
@@ -105,6 +116,6 @@ export function LocaleList() {
           ))}
         </List>
       )}
-    </Paper>
+    </Drawer>
   );
 }
