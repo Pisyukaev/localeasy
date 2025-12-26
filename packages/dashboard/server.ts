@@ -13,6 +13,7 @@ import {
   readDir,
   isDirectory,
   addToFiles,
+  deleteFromFiles,
 } from '@localeasy/core';
 import type { LocaleData } from '@localeasy/core';
 
@@ -171,26 +172,37 @@ export function createServer(options: ServerOptions = {}) {
   });
 
   // Delete key from locale file
-  app.delete('/api/locales/:file/keys/:key', (req, res) => {
+  app.delete('/api/locales/delete/key', (req, res) => {
     try {
-      const { file, key } = req.params;
-      const filePath = path.join(LOCALES_DIR, `${file}.json`);
+      const { key, file, force } = req.body;
 
-      let data: LocaleData;
-      try {
-        data = readLocaleFile(filePath);
-      } catch {
-        return res.status(404).json({ error: 'Locale file not found' });
+      if (!force && file === '') {
+        res.status(400).json({
+          message: 'File is not provided',
+        });
       }
 
-      if (!hasKey(data, key)) {
-        return res.status(404).json({ error: 'Key not found' });
+      if (force) {
+        deleteFromFiles(LOCALES_DIR, key);
+      } else {
+        const filePath = path.join(LOCALES_DIR, `${file}.json`);
+
+        let data: LocaleData;
+        try {
+          data = readLocaleFile(filePath);
+        } catch {
+          return res.status(404).json({ error: 'Locale file not found' });
+        }
+
+        if (!hasKey(data, key)) {
+          return res.status(404).json({ error: 'Key not found' });
+        }
+
+        data = removeKey(data, key);
+        writeLocaleFile(filePath, data);
       }
 
-      data = removeKey(data, key);
-      writeLocaleFile(filePath, data);
-
-      res.json({ file, key, data, message: 'Key deleted successfully' });
+      res.json({ file, key, message: 'Key deleted successfully' });
     } catch (error) {
       res.status(500).json({
         error: 'Failed to delete key',
