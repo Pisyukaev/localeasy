@@ -86,6 +86,31 @@ export async function addKey({
   return response.json();
 }
 
+export async function addKeyToAllFiles({
+  key,
+  value,
+  force = false,
+}: {
+  key: string;
+  value: string;
+  force: boolean;
+}) {
+  console.log(key, value, force);
+  const response = await fetch(`${API_BASE}/locales/add/key`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      key,
+      value,
+      force,
+    }),
+  });
+
+  return response.json();
+}
+
 export async function deleteKey({
   file,
   key,
@@ -137,4 +162,5 @@ export const apiClient = {
   deleteKey,
   sortLocaleFile,
   healthCheck,
+  addKeyToAllFiles,
 };

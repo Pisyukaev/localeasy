@@ -1,7 +1,6 @@
 import { createEvent, createEffect, sample } from 'effector';
 
 import {
-  $locales,
   $selectedLocale,
   $loading,
   loadLocales,
@@ -17,43 +16,13 @@ export interface AddKeyToAllParams {
 
 export const addKeyToAll = createEvent<AddKeyToAllParams>();
 
-export const addKeyToAllFx = createEffect(
-  async ({
-    locales,
-    key,
-    value,
-    force,
-  }: { locales: string[] } & AddKeyToAllParams) => {
-    const results = await Promise.allSettled(
-      locales.map((file) => apiClient.addKey({ file, key, value, force }))
-    );
-
-    const errors: string[] = [];
-    results.forEach((result, index) => {
-      if (result.status === 'rejected') {
-        errors.push(
-          `${locales[index]}: ${result.reason instanceof Error ? result.reason.message : String(result.reason)}`
-        );
-      }
-    });
-
-    if (errors.length > 0) {
-      throw new Error(`Failed to add key to some files:\n${errors.join('\n')}`);
-    }
-
-    return results;
-  }
-);
+export const addKeyToAllFx = createEffect(apiClient.addKeyToAllFiles);
 
 $loading.on(addKeyToAllFx.pending, (_, pending) => pending);
 
 sample({
   clock: addKeyToAll,
-  source: $locales,
-  fn: (locales, params) => ({
-    locales: locales.map((locale) => locale.code),
-    ...params,
-  }),
+  filter: ({ key, value }) => key !== '' && value !== '',
   target: addKeyToAllFx,
 });
 
