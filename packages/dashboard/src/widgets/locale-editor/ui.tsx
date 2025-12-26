@@ -34,6 +34,7 @@ import {
 import { sortKeys } from 'features/sort-keys';
 import { editKey, editKeyAndName } from 'features/edit-key';
 import { deleteKey, DeleteKeyDialog } from 'features/delete-key';
+import { AddKeyForm } from 'features/add-key';
 import { AddKeyToAllDialog } from 'features/add-key-to-all';
 
 const styles = {
@@ -231,6 +232,8 @@ export function LocaleEditor() {
           {error}
         </Alert>
       )}
+
+      <AddKeyForm />
 
       <Box
         sx={{
