@@ -7,16 +7,21 @@ import {
   validateFilePath,
   validateDirectoryPath,
 } from '@localeasy/core';
-import type { LocaleData } from '@localeasy/core';
+import type { LocaleData, SortType } from '@localeasy/core';
 
 export const sortCommand = new Command('sort')
   .description('Sort translation entries in locale files')
   .option('-f, --file <path>', 'Path to the locale file to sort')
   .option('-d, --directory <path>', 'Directory containing locale files to sort')
+  .option(
+    '--type <type>',
+    'Sort type: asc (alphabetical A-Z), desc (alphabetical Z-A)',
+    'asc'
+  )
   .option('--dry-run', 'Show what would be sorted without making changes')
   .action((options) => {
     try {
-      const { file, directory, dryRun } = options;
+      const { file, directory, dryRun, type } = options;
 
       if (file && directory) {
         console.error(
@@ -30,10 +35,20 @@ export const sortCommand = new Command('sort')
         process.exit(1);
       }
 
+      const validSortTypes: SortType[] = ['asc', 'desc'];
+      const sortType = (type || 'asc').toLowerCase() as SortType;
+
+      if (!validSortTypes.includes(sortType)) {
+        console.error(
+          `❌ Invalid sort type: ${type}. Valid types are: ${validSortTypes.join(', ')}`
+        );
+        process.exit(1);
+      }
+
       if (file) {
-        sortSingleFile(file, dryRun);
+        sortSingleFile(file, dryRun, sortType);
       } else if (directory) {
-        sortDirectory(directory, dryRun);
+        sortDirectory(directory, dryRun, sortType);
       }
     } catch (error) {
       console.error('❌ Error sorting translations:', error);
@@ -41,7 +56,7 @@ export const sortCommand = new Command('sort')
     }
   });
 
-function sortSingleFile(filePath: string, dryRun: boolean) {
+function sortSingleFile(filePath: string, dryRun: boolean, sortType: SortType) {
   if (!validateFilePath(filePath)) {
     console.error('❌ Invalid file path. File should be a .json file');
     process.exit(1);
@@ -57,7 +72,7 @@ function sortSingleFile(filePath: string, dryRun: boolean) {
   }
 
   // Sort entries
-  const sortedData = sortLocaleData(data);
+  const sortedData = sortLocaleData(data, sortType);
 
   // Check if the order has changed
   const isAlreadySorted = JSON.stringify(data) === JSON.stringify(sortedData);
@@ -68,12 +83,12 @@ function sortSingleFile(filePath: string, dryRun: boolean) {
   }
 
   if (dryRun) {
-    console.log(`🔍 Dry run - would sort ${filePath}:`);
+    console.log(`🔍 Dry run - would sort ${filePath} (type: ${sortType}):`);
     console.log('Current order:');
     Object.keys(data).forEach((key, index) => {
       console.log(`  ${index + 1}. ${key}`);
     });
-    console.log('\nSorted order:');
+    console.log(`\nSorted order (${sortType}):`);
     Object.keys(sortedData).forEach((key, index) => {
       console.log(`  ${index + 1}. ${key}`);
     });
@@ -83,13 +98,13 @@ function sortSingleFile(filePath: string, dryRun: boolean) {
 
   writeLocaleFile(filePath, sortedData);
 
-  console.log(`✅ Successfully sorted ${filePath}`);
+  console.log(`✅ Successfully sorted ${filePath} (type: ${sortType})`);
   console.log(
     `📝 Sorted ${Object.keys(sortedData).length} translation entries`
   );
 }
 
-function sortDirectory(dirPath: string, dryRun: boolean) {
+function sortDirectory(dirPath: string, dryRun: boolean, sortType: SortType) {
   if (!validateDirectoryPath(dirPath)) {
     console.error('❌ Invalid directory path');
     process.exit(1);
@@ -108,7 +123,9 @@ function sortDirectory(dirPath: string, dryRun: boolean) {
     return;
   }
 
-  console.log(`🔍 Found ${localeFiles.length} locale files in ${dirPath}`);
+  console.log(
+    `🔍 Found ${localeFiles.length} locale files in ${dirPath} (sort type: ${sortType})`
+  );
 
   let sortedCount = 0;
   let alreadySortedCount = 0;
@@ -116,7 +133,7 @@ function sortDirectory(dirPath: string, dryRun: boolean) {
   for (const filePath of localeFiles) {
     try {
       const data = readLocaleFile(filePath);
-      const sortedData = sortLocaleData(data);
+      const sortedData = sortLocaleData(data, sortType);
 
       const isAlreadySorted =
         JSON.stringify(data) === JSON.stringify(sortedData);

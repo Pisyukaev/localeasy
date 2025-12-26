@@ -33,8 +33,25 @@ export const findLocaleFiles = (directory: string) => {
   }
 };
 
-export const sortLocaleData = (data: LocaleData) => {
-  const sortedKeys = Object.keys(data).sort();
+export type SortType = 'asc' | 'desc';
+
+export const sortLocaleData = (
+  data: LocaleData,
+  sortType: SortType = 'asc'
+) => {
+  const keys = Object.keys(data);
+  let sortedKeys: string[];
+
+  switch (sortType) {
+    case 'desc':
+      sortedKeys = [...keys].sort((a, b) => b.localeCompare(a));
+      break;
+    case 'asc':
+    default:
+      sortedKeys = [...keys].sort();
+      break;
+  }
+
   const sortedData: LocaleData = {};
 
   for (const key of sortedKeys) {
