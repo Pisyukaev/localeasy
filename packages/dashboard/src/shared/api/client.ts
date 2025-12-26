@@ -112,18 +112,25 @@ export async function addKeyToAllFiles({
 }
 
 export async function deleteKey({
-  file,
+  file = '',
   key,
+  force = false,
 }: {
-  file: string;
   key: string;
+  file?: string;
+  force: boolean;
 }): Promise<LocaleFileContent> {
-  const response = await fetch(
-    `${API_BASE}/locales/${file}/keys/${encodeURIComponent(key)}`,
-    {
-      method: 'DELETE',
-    }
-  );
+  const response = await fetch(`${API_BASE}/locales/delete/key`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      file,
+      key,
+      force,
+    }),
+  });
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to delete key');

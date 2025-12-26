@@ -186,9 +186,15 @@ export function LocaleEditor() {
     setDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = ({
+    key,
+    force,
+  }: {
+    key: string;
+    force: boolean;
+  }) => {
     if (keyToDelete) {
-      deleteKey(keyToDelete);
+      deleteKey({ key, force });
       setDeleteDialogOpen(false);
       setKeyToDelete(null);
     }
